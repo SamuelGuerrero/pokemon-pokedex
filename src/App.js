@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import SearchPokemon from "./components/SearchPokemon";
@@ -8,14 +8,16 @@ function App() {
   const [pokemon, setPokemon] = useState(null);
   const [error, setError] = useState("");
   const [isCharging, setIsCharging] = useState(false);
+  const [pokemonName, setPokemonName] = useState("");
 
   const getPokemon = async (pokemonName) => {
     setIsCharging(true);
-
+    setError(null);
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
       .then((res) => res.json())
       .then((data) => setPokemon(data))
       .catch(function (error) {
+        console.log(error);
         setPokemon(null);
         setError(error);
       });
@@ -26,7 +28,11 @@ function App() {
   return (
     <div className="App">
       <Header />
-      {!error && <SearchPokemon getPokemon={getPokemon} />}
+      <SearchPokemon
+        getPokemon={getPokemon}
+        pokemonName={pokemonName}
+        setPokemonName={setPokemonName}
+      />
 
       {isCharging && <h1>Cargando...</h1>}
       {pokemon && (
@@ -36,10 +42,16 @@ function App() {
       )}
       {error && (
         <div className="mt-10">
-          <h1 className="text-xl font-bold">Error, enter the name of a valid Pokemon</h1>
-          <button onClick={() =>{
-            setError(null)
-          }} className="bg-[#ffde00] shadow-red-500 text-black font-bold py-2 px-2 mt-2 rounded-md hover:bg-red-400 hover:shadow-xl active:scale-90 transition duration-150">
+          <h1 className="text-xl font-bold">
+            Error, enter the name of a valid Pokemon
+          </h1>
+          <button
+            onClick={() => {
+              setError(null);
+              setPokemonName("");
+            }}
+            className="bg-[#ffde00] shadow-red-500 text-black font-bold py-2 px-2 mt-2 rounded-md hover:bg-red-400 hover:shadow-xl active:scale-90 transition duration-150"
+          >
             Try again
           </button>
         </div>
